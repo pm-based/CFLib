@@ -1,4 +1,4 @@
-function X_t = SimMertonAssetPrice(sigmaD, muJ, sigmaJ, lambda, T, nTimeSteps, nProcesses)
+function X_t = SimMertonAssetPrice(sigmaD, lambda, muJ, sigmaJ, T, nTimeSteps, nProcesses)
 % MERTONPROCESS Simulates paths of a Merton jump-diffusion process.
 % This function generates a matrix of simulated values from a Merton jump-diffusion
 % process, which incorporates both Gaussian diffusion elements and a jump process

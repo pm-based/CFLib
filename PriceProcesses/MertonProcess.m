@@ -16,11 +16,19 @@ function [X_t, t_i] = MertonProcess(sigmaD, muJ, sigmaJ, lambda, T, nTimeSteps, 
 % OUTPUTS:
 %   X_t          - A matrix of size (nProcesses x (nTimeSteps+1)) where each row represents
 %                  a simulated path of the Merton model.
+%   t_i          - A vector of length (nTimeSteps+1) representing the discrete time points
+%                  at which the process is evaluated.
+%
+% DESCRIPTION:
+%   The Merton jump-diffusion model includes both a continuous Gaussian diffusion part
+%   and a jump component characterized by a Poisson process with normally distributed jump sizes.
+%   This allows modeling assets with occasional large jumps in price in addition to the standard
+%   continuous diffusive behavior.
 
 % Calculate the time increment.
-dt = T/nTimeSteps;
+dt = T / nTimeSteps;
 
-% Time vector from dt to T at intervals of dt.
+% Time vector from 0 to T at intervals of dt.
 t_i = dt:dt:T;
 
 % Define the characteristic exponent Psi for the Lévy process in the Merton model.

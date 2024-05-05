@@ -7,7 +7,7 @@ function [optionPrice, priceCI] = UEOptPriceMC(spotPrice, strike, rate, TTM, ...
 % Kou jump-diffusion model and calculates the European option price and a 
 % confidence% interval for the price estimate.
 %
-% Inputs:
+% INPUTS:
 %   spotPrice   - Current price of the underlying asset.
 %   strike      - Strike price of the option.
 %   rate        - Annual risk-free interest rate, expressed as a decimal.
@@ -17,7 +17,7 @@ function [optionPrice, priceCI] = UEOptPriceMC(spotPrice, strike, rate, TTM, ...
 %   modelParams - Struct containing parameters for the chosen price model.
 %   nSims       - Number of Monte Carlo simulations to run.
 %
-% Outputs:
+% OUTPUTS:
 %   optionPrice - Estimated price of the European option.
 %   priceCI     - 95% confidence interval for the option price estimate.
 %

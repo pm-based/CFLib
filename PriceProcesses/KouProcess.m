@@ -17,9 +17,19 @@ function [X_t, t_i] = KouProcess(sigmaD, lambda, lambdaP, lambdaN, p, T, nTimeSt
 % OUTPUTS:
 %   X_t          - A matrix of size (nProcesses x (nTimeSteps+1)) where each row represents
 %                  a simulated path of the process.
+%   t_i          - A vector of length (nTimeSteps+1) representing the discrete time points
+%                  at which the process is evaluated.
+%
+% DESCRIPTION:
+%   The Kou jump-diffusion model includes both a continuous Gaussian component (diffusion part)
+%   and a jump component characterized by a double exponential distribution. Positive jumps
+%   follow one exponential distribution (with rate lambdaP), while negative jumps follow another
+%   exponential distribution (with rate lambdaN), making this model asymmetric and suitable for
+%   modeling assets with skewed jump behavior.
+
 
 % Calculate the time increment.
-dt = T/nTimeSteps;
+dt = T / nTimeSteps;
 t_i = 0:dt:T;
 
 % Initialize the matrix to store the process values. First column is zero (initial value).
@@ -43,7 +53,7 @@ for j = 1:nTimeSteps
     X_t(:, j+1) = X_t(:, j) + muD*dt + sigmaD * sqrt(dt) * Z(:, j);
     
     % Loop over each process to apply the jump component.
-    for i = 1:nProcesses
+    for i = 1<nProcesses
         % Check if there are jumps in this time step for the current process.
         if (Ndt(i, j) > 0)
             Y = 0;
@@ -63,4 +73,5 @@ for j = 1:nTimeSteps
             X_t(i, j+1) = X_t(i, j+1) + Y;
         end
     end
+end
 end

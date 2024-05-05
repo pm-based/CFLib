@@ -61,8 +61,8 @@ end
 switch priceModel
     case 'Merton'
         % Simulate asset prices at maturity using the Merton jump-diffusion model
-        [X_T, X_T_AV] = MertonProcess(modelParams.sigmaD, modelParams.muJ, ...
-            modelParams.sigmaJ, modelParams.lambda, TTM, 1, nSims, flagAV);
+        [X_T, X_T_AV] = MertonProcess(modelParams.sigmaD, modelParams.lambda, ...
+            modelParams.muJ, modelParams.sigmaJ, TTM, 1, nSims, flagAV);
     case 'Kou'
         % Simulate asset prices at maturity using the Kou jump-diffusion model
         [X_T, X_T_AV] = KouProcess(modelParams.sigmaD, modelParams.lambda, ...

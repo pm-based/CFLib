@@ -1,4 +1,4 @@
-function [X_t, X_t_AV, t_i] = MertonProcess(sigmaD, muJ, sigmaJ, lambda, T, nTimeSteps, nProcesses, flagAV)
+function [X_t, X_t_AV, t_i] = MertonProcess(sigmaD, lambda, muJ, sigmaJ, T, nTimeSteps, nProcesses, flagAV)
 % MERTONPROCESS Simulates paths of a Merton jump-diffusion process.
 % This function generates matrices of simulated values from a Merton jump-diffusion
 % process, which incorporates both Gaussian diffusion elements and a jump process
@@ -6,9 +6,9 @@ function [X_t, X_t_AV, t_i] = MertonProcess(sigmaD, muJ, sigmaJ, lambda, T, nTim
 %
 % INPUTS:
 %   sigmaD       - Volatility of the diffusion part of the stock price.
+%   lambda       - Intensity of the jump process (average number of jumps per unit time).
 %   muJ          - Mean of the jump size distribution.
 %   sigmaJ       - Standard deviation of the jump size distribution.
-%   lambda       - Intensity of the jump process (average number of jumps per unit time).
 %   T            - Total time span of the simulation.
 %   nTimeSteps   - Number of time steps in the simulation.
 %   nProcesses   - Number of independent process paths to simulate.

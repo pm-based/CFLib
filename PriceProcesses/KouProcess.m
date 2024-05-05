@@ -76,7 +76,7 @@ for j = 1:nTimeSteps
     end
 
     % Loop over each process to apply the jump component.
-    for i = 1<nProcesses
+    for i = 1:nProcesses
         % Check if there are jumps in this time step for the current process.
         if Ndt(i, j) > 0
             Y = 0;

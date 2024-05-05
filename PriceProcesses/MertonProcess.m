@@ -81,10 +81,6 @@ X_t = muW * t_i .* ones(nProcesses, nTimeSteps) ...
         + B_t ...
         + cumsum(Y, 2);
 
-% Prepend zeros to represent the starting value of the process.
-X_t = cat(2, zeros(nProcesses, 1), X_t);
-t_i = cat(2, 0, t_i);
-
 if flagAV
     % Compute the antithetic paths with the opposite sign of the diffusion component.
     X_t_AV = muW * t_i .* ones(nProcesses, nTimeSteps) ...
@@ -97,5 +93,9 @@ else
     % Return an empty matrix if antithetic variates are not requested.
     X_t_AV = [];
 end
+
+% Prepend zeros to represent the starting value of the process.
+X_t = cat(2, zeros(nProcesses, 1), X_t);
+t_i = cat(2, 0, t_i);
 
 end

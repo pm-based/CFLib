@@ -19,15 +19,20 @@ mertonParams.lambda = 10;
 mertonParams.muJ    = -0.01;
 mertonParams.sigmaJ = 0.4;
 
-
-[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims);
+disp('MC price Eu option, Merton model')
+[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims)
+disp('MC price Eu option, Merton model using Antitetich Variable')
+[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims, true)
 
 %% Kou
 priceModel = 'Kou';
 kouParams.sigmaD    = 0.7;
 kouParams.lambda    = 10;
-kouParams.lambdaP   = 0.3;
-kouParams.lambdaN   = 0.2;
-kouParams.p         = 0.4;
+kouParams.lambdaP   = 15;
+kouParams.lambdaN   = 25;
+kouParams.p         = 0.6;
 
-[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims);
+disp('MC price Eu option, Kou model')
+[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims)
+disp('MC price Eu option, Kou model using Antitetich Variable')
+[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims, true)

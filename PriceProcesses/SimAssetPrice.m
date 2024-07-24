@@ -28,11 +28,11 @@ function [S_t,t_i] = SimAssetPrice(spotPrice, rate, T, nTimeSteps, nProcesses, p
 switch priceModel
     case 'Merton'
         % Simulate asset prices using the Merton jump-diffusion model.
-        [X_t, t_i] = MertonProcess(modelParams.sigmaD, modelParams.lambda, ...
+        [X_t, ~, t_i] = MertonProcess(modelParams.sigmaD, modelParams.lambda, ...
             modelParams.muJ, modelParams.sigmaJ, T, nTimeSteps, nProcesses);
     case 'Kou'
         % Simulate asset prices using the Kou jump-diffusion model.
-        [X_t, t_i] = KouProcess(modelParams.sigmaD, modelParams.lambda, ...
+        [X_t, ~, t_i] = KouProcess(modelParams.sigmaD, modelParams.lambda, ...
                             modelParams.lambdaP, modelParams.lambdaN, ...
                             modelParams.p, T, nTimeSteps, nProcesses);
 end
@@ -40,5 +40,5 @@ end
 % Compute the asset prices at each time step using the formula:
 % S_t = S_0 * exp(-r * t_i + X_t), where S_0 is the initial spot price, 
 % r is the risk-free rate, t_i are the time points, and X_t is the process from the selected model.
-S_t = spotPrice * exp(-rate * t_i + X_t);
+S_t = spotPrice * exp(rate * t_i + X_t);
 end

@@ -1,4 +1,4 @@
-function [X_t, X_t_AV, t_i] = KouProcess(sigmaD, lambda, lambdaP, lambdaN, p, T, nTimeSteps, nProcesses, flagAV)
+function [X_t, t_i, X_t_AV] = KouProcess(sigmaD, lambda, lambdaP, lambdaN, p, T, nTimeSteps, nProcesses, flagAV)
 % KOUPROCESS Simulates paths of a Kou jump-diffusion process.
 % This function generates matrices of simulated values from a Kou jump-diffusion
 % process, which is useful for modeling financial data with both continuous

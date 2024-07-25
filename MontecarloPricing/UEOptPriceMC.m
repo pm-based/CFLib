@@ -1,5 +1,5 @@
 function [optionPrice, priceCI] = UEOptPriceMC(spotPrice, strike, rate, TTM, ...
-    putFlag, priceModel, modelParams, nSims, flagAV)
+    putFlag, priceModel, modelParams, nSims, VarReduction)
 % UEOptPriceMC Calculates the price of a European option using Monte Carlo simulation.
 %
 % This function simulates the final asset price using either the Merton or Kou
@@ -46,8 +46,14 @@ function [optionPrice, priceCI] = UEOptPriceMC(spotPrice, strike, rate, TTM, ...
 % Add the directory containing the price models to the MATLAB path
 addpath(genpath(fullfile('..', 'PriceProcesses')));
 
+
 if nargin < 9
+    VarReduction = 'none';
     flagAV = false;
+elseif VarReduction ~= 'AV'
+    flagAV = false;
+else
+    flagAV = true;
 end
 
 % Convert the putFlag into a numerical value that will be used in the payoff calculation
@@ -57,33 +63,37 @@ else
     putFlag = 1;   % For a call option, payoff involves max(S - K, 0)
 end
 
-% Select and run the appropriate asset price model based on the input
-switch priceModel
-    case 'Merton'
-        % Simulate asset prices at maturity using the Merton jump-diffusion model
-        [X_T, X_T_AV] = MertonProcess(modelParams.sigmaD, modelParams.lambda, ...
-            modelParams.muJ, modelParams.sigmaJ, TTM, 1, nSims, flagAV);
-    case 'Kou'
-        % Simulate asset prices at maturity using the Kou jump-diffusion model
-        [X_T, X_T_AV] = KouProcess(modelParams.sigmaD, modelParams.lambda, ...
-                            modelParams.lambdaP, modelParams.lambdaN, ...
-                            modelParams.p, TTM, 1, nSims, flagAV);
-end
+[S_t, ~, S_t_AV] = SimAssetPrice(spotPrice, rate, TTM, 1, nSims, priceModel, modelParams, flagAV);
 
 % Extract the simulated asset prices at maturity
-X_T = X_T(:, end);
-discountedPayoff = exp(-rate*TTM) * max(0, putFlag * (spotPrice * exp(X_T) - strike));
+discountedPayoff = exp(-rate*TTM) * max(0, putFlag * (S_t(:,end) - strike));
 
-if flagAV
-    % Compute the antithetic payoffs
-    X_T_AV = X_T_AV(:, end);
-    discountedPayoff_AV = exp(-rate*TTM) * max(0, putFlag * (spotPrice * exp(X_T_AV) - strike));
-    
-    % Calculate the option price and confidence interval using both original and antithetic payoffs
-    [optionPrice, ~, priceCI] = normfit((discountedPayoff + discountedPayoff_AV) / 2);
-else
-    % Calculate the option price and confidence interval using only the original payoffs
-    [optionPrice, ~, priceCI] = normfit(discountedPayoff);
-end
+
+switch VarReduction
+    case 'AV'
+        % Compute the antithetic payoffs
+        discountedPayoff_AV = exp(-rate*TTM) * max(0, putFlag * (S_t_AV(:,end) - strike));
+
+        % Calculate the option price and confidence interval using both original and antithetic payoffs
+        [optionPrice, ~, priceCI] = normfit((discountedPayoff + discountedPayoff_AV) / 2);
+
+    case 'CV'
+        % 1. sample alpha
+        nSims_CV = nSims/100;
+        S_t_CV = SimAssetPrice(spotPrice, rate, TTM, 1, nSims_CV, priceModel, modelParams, false);
+        f = S_t_CV(:,end);
+        g = exp(-rate*TTM) * max(f-strike, 0);
+        VC = cov(f,g);
+        alpha = -VC(1,2)/VC(1,1);
+
+        % 2. compute the price
+        f = S_t(:,end);
+        Ef = spotPrice * exp(rate*TTM);
+        g = exp(-rate*TTM) * max(f-strike, 0);
+        [optionPrice,~,priceCI] = normfit( g + alpha*(f-Ef) );
+
+    otherwise
+        % Calculate the option price and confidence interval using only the original payoffs
+        [optionPrice, ~, priceCI] = normfit(discountedPayoff);
 
 end

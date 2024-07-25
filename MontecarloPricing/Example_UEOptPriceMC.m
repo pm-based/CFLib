@@ -20,9 +20,17 @@ mertonParams.muJ    = -0.01;
 mertonParams.sigmaJ = 0.4;
 
 disp('MC price Eu option, Merton model')
-[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims)
+[price, CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims)
+width_CI_MC = diff(CIprice)
+
 disp('MC price Eu option, Merton model using Antitetich Variable')
-[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims, true)
+[price, CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims, 'AV')
+width_CI_AV = diff(CIprice)
+
+disp('MC price Eu option, Merton model using Control Variable')
+[price, CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims, 'CV')
+width_CI_CV = diff(CIprice)
+
 
 %% Kou
 priceModel = 'Kou';
@@ -34,5 +42,13 @@ kouParams.p         = 0.6;
 
 disp('MC price Eu option, Kou model')
 [price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims)
+width_CI_MC = diff(CIprice)
+
+
 disp('MC price Eu option, Kou model using Antitetich Variable')
-[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims, true)
+[price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims, 'AV')
+width_CI_AV = diff(CIprice)
+
+disp('MC price Eu option, Kou model using Control Variable')
+[price, CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims, 'CV')
+width_CI_CV = diff(CIprice)

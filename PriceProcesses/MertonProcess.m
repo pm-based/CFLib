@@ -1,4 +1,4 @@
-function [X_t, X_t_AV, t_i] = MertonProcess(sigmaD, lambda, muJ, sigmaJ, T, nTimeSteps, nProcesses, flagAV)
+function [X_t, t_i, X_t_AV] = MertonProcess(sigmaD, lambda, muJ, sigmaJ, T, nTimeSteps, nProcesses, flagAV)
 % MERTONPROCESS Simulates paths of a Merton jump-diffusion process.
 % This function generates matrices of simulated values from a Merton jump-diffusion
 % process, which incorporates both Gaussian diffusion elements and a jump process

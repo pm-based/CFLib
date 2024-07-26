@@ -97,3 +97,4 @@ switch VarReduction
         [optionPrice, ~, priceCI] = normfit(discountedPayoff);
 
 end
+end

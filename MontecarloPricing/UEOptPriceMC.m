@@ -1,5 +1,5 @@
 function [optionPrice, priceCI] = UEOptPriceMC(spotPrice, strike, rate, TTM, ...
-    putFlag, priceModel, modelParams, nSims, VarReduction)
+    putFlag, priceModel, modelParams, nSims, VarReduction, barrierType, barrier, nMonitoring)
 % UEOptPriceMC Calculates the price of a European option using Monte Carlo simulation.
 %
 % This function simulates the final asset price using either the Merton or Kou
@@ -46,15 +46,50 @@ function [optionPrice, priceCI] = UEOptPriceMC(spotPrice, strike, rate, TTM, ...
 % Add the directory containing the price models to the MATLAB path
 addpath(genpath(fullfile('..', 'PriceProcesses')));
 
+if nargin < 10      % If barrier type is not defined
+    barrier = nan;
+    barrierType = 'none';
+    nMonitoring = 1;
+    barrierCheck = @(S_t,barrier) 1;
 
-if nargin < 9
+elseif nargin < 12 % If barrier or nMonitoring value is not defined
+    barrier = nan;
+    barrierType = 'none';
+    nMonitoring = 1;
+    barrierCheck = @(S_t,barrier) 1;
+    disp('ERROR: no barrier or nMonitoring value specified, no barrier used.')
+
+elseif barrierType == 'DO'
+    barrierCheck = @(S_t,barrier) (min(S_t,[],2) > barrier);
+    
+elseif barrierType == 'DI'
+    barrierCheck = @(S_t,barrier) (min(S_t,[],2) < barrier);
+
+elseif barrierType == 'UO'
+    barrierCheck = @(S_t,barrier) (max(S_t,[],2) > barrier);
+
+elseif barrierType == 'UI'
+    barrierCheck = @(S_t,barrier) (max(S_t,[],2) < barrier);
+
+else
+    barrier = nan;
+    barrierType = 'none';
+    barrierCheck = @(S_t,barrier) 1;
+    disp('ERROR: barrier type not allowed, no barrier used.')
+end
+
+if nargin < 9       % If the neither VarReduction nor the others arg are defined
+    % Variance Reduction args
     VarReduction = 'none';
     flagAV = false;
-elseif VarReduction ~= 'AV'
+
+elseif ~strcmp(VarReduction, 'AV')
     flagAV = false;
+
 else
     flagAV = true;
 end
+
 
 % Convert the putFlag into a numerical value that will be used in the payoff calculation
 if putFlag
@@ -63,16 +98,16 @@ else
     putFlag = 1;   % For a call option, payoff involves max(S - K, 0)
 end
 
-[S_t, ~, S_t_AV] = SimAssetPrice(spotPrice, rate, TTM, 1, nSims, priceModel, modelParams, flagAV);
+[S_t, ~, S_t_AV] = SimAssetPrice(spotPrice, rate, TTM, nMonitoring, nSims, priceModel, modelParams, flagAV);
 
 % Extract the simulated asset prices at maturity
-discountedPayoff = exp(-rate*TTM) * max(0, putFlag * (S_t(:,end) - strike));
+discountedPayoff = exp(-rate*TTM) * max(0, putFlag * (S_t(:,end) - strike)) .* barrierCheck(S_t,barrier);
 
 
 switch VarReduction
     case 'AV'
         % Compute the antithetic payoffs
-        discountedPayoff_AV = exp(-rate*TTM) * max(0, putFlag * (S_t_AV(:,end) - strike));
+        discountedPayoff_AV = exp(-rate*TTM) * max(0, putFlag * (S_t_AV(:,end) - strike)) .* barrierCheck(S_t_AV,barrier);
 
         % Calculate the option price and confidence interval using both original and antithetic payoffs
         [optionPrice, ~, priceCI] = normfit((discountedPayoff + discountedPayoff_AV) / 2);
@@ -80,16 +115,16 @@ switch VarReduction
     case 'CV'
         % 1. sample alpha
         nSims_CV = nSims/100;
-        S_t_CV = SimAssetPrice(spotPrice, rate, TTM, 1, nSims_CV, priceModel, modelParams, false);
+        S_t_CV = SimAssetPrice(spotPrice, rate, TTM, nMonitoring, nSims_CV, priceModel, modelParams, false);
         f = S_t_CV(:,end);
-        g = exp(-rate*TTM) * max(f-strike, 0);
+        g = exp(-rate*TTM) * max(putFlag * (f-strike), 0) .* barrierCheck(S_t_CV,barrier);
         VC = cov(f,g);
         alpha = -VC(1,2)/VC(1,1);
 
         % 2. compute the price
         f = S_t(:,end);
         Ef = spotPrice * exp(rate*TTM);
-        g = exp(-rate*TTM) * max(f-strike, 0);
+        g = exp(-rate*TTM) * max(putFlag * (f-strike), 0) .* barrierCheck(S_t,barrier);
         [optionPrice,~,priceCI] = normfit( g + alpha*(f-Ef) );
 
     otherwise

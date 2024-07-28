@@ -3,12 +3,16 @@ clc
 
 %% UE vanilla option pricing
 % simulation params
-nSims = 1e5;
+nSims = 1e6;
+
+% Market params
+spotPrice = 98;
+rate = 0.0001;
+
+% !!!!! IN QUELLO DEL PROF C'è ANCHE M (MA SERVE???)
 
 % option params
-spotPrice = 98;
 strike = 100;
-rate = 0.0001;
 TTM = 1;
 putFlag = false;
 
@@ -21,7 +25,7 @@ mertonParams.sigmaJ = 0.4;
 
 disp('MC price Eu option, Merton model')
 [price, CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims)
-width_CI_MC = diff(CIprice)
+width_CI_Standard = diff(CIprice)
 
 disp('MC price Eu option, Merton model using Antitetich Variable')
 [price, CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, mertonParams, nSims, 'AV')
@@ -42,8 +46,7 @@ kouParams.p         = 0.6;
 
 disp('MC price Eu option, Kou model')
 [price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims)
-width_CI_MC = diff(CIprice)
-
+width_CI_Standard = diff(CIprice)
 
 disp('MC price Eu option, Kou model using Antitetich Variable')
 [price,CIprice] = UEOptPriceMC(spotPrice, strike, rate, TTM, putFlag, priceModel, kouParams, nSims, 'AV')

@@ -31,6 +31,8 @@ if nargin < 8
 end
 
 switch priceModel
+    case 'GBM'
+        [X_t, t_i, X_t_AV] = GBMProcess(modelParams.sigma, T, nTimeSteps, nProcesses, flagAV);
     case 'Merton'
         % Simulate asset prices using the Merton jump-diffusion model.
         [X_t, t_i, X_t_AV] = MertonProcess(modelParams.sigmaD, modelParams.lambda, ...

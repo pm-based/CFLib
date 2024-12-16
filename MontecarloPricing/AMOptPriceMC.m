@@ -1,5 +1,9 @@
 function [optionPrice, priceCI] = AMOptPriceMC(spotPrice, strike, rate, TTM, ...
     putFlag, priceModel, modelParams, nSims, nMonitoring)
+% RIGA 72: 
+% TODO: DA ADATTARE ALLA CALL
+
+
 % UEOptPriceMC Calculates the price of a European option using Monte Carlo simulation.
 %
 % This function simulates the final asset price using either the Merton or Kou
@@ -66,7 +70,7 @@ for j = nMonitoring-1:-1:1
     Inmoney = find(S_t(:,j)<strike);
     S_I = S_t(Inmoney,j);
     %-- Intrinsic Value
-    IV = strike-S_I;
+    IV = strike-S_I; % DA ADATTARE PER LA CALL
     %-- Continuation Value 
     %- Regression
 
